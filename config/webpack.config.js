@@ -299,12 +299,13 @@ module.exports = function (webpackEnv) {
       // https://github.com/facebook/create-react-app/issues/253
       fallback: {
         fs: false,
-            net: false,
-            stream: require.resolve('stream-browserify'),
-            crypto: require.resolve('crypto-browserify'),
-            http: require.resolve('stream-http'),
-            https: require.resolve('https-browserify'),
-            os: require.resolve('os-browserify/browser'),
+        net: false,
+        buffer: require.resolve('buffer'),
+        stream: require.resolve('stream-browserify'),
+        crypto: require.resolve('crypto-browserify'),
+        http: require.resolve('stream-http'),
+        https: require.resolve('https-browserify'),
+        os: require.resolve('os-browserify/browser'),
       },
       modules: ['node_modules', paths.appNodeModules].concat(
         modules.additionalModulePaths || []
@@ -343,6 +344,9 @@ module.exports = function (webpackEnv) {
           babelRuntimeEntryHelpers,
           babelRuntimeRegenerator,
         ]),
+        new webpack.ProvidePlugin({
+          Buffer: ['buffer', 'Buffer'],
+        }),
       ],
     },
     module: {
@@ -351,7 +355,11 @@ module.exports = function (webpackEnv) {
         // Handle node_modules packages that contain sourcemaps
         shouldUseSourceMap && {
           enforce: 'pre',
-          exclude: /@babel(?:\/|\\{1,2})runtime/,
+          exclude: [
+            /@babel(?:\/|\\{1,2})runtime/,
+            /@ethersproject/,
+            /@chainsafe/,
+          ],
           test: /\.(js|mjs|jsx|ts|tsx|css)$/,
           loader: require.resolve('source-map-loader'),
         },
